@@ -1,0 +1,18 @@
+# Copy to terraform.tfvars and fill in your values.
+
+lambda_image_uri = "990207457148.dkr.ecr.us-east-1.amazonaws.com/mcp-ig-extension:20260615-120000"
+# Best obtained by running: make push-to-ecr
+
+mcp_base_url         = "https://<your-mcp-function-id>.lambda-url.us-east-1.on.aws/"
+mcp_auth_secret_name = "mcp/ig-extension/bearer-token"
+
+# Optional: explicit ARNs for IG token secrets (in addition to MCP auth secret)
+# ig_secret_arns = [
+#   "arn:aws:secretsmanager:us-east-1:990207457148:secret:ig/me2dafuture/access-token-AbCdEf",
+# ]
+
+# schedule_expression = "rate(6 hours)"
+# dummy_mode          = true
+# dry_run             = false
+# lambda_memory_size  = 512
+# lambda_timeout      = 300

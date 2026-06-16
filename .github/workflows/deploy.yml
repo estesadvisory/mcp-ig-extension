@@ -1,0 +1,17 @@
+# Placeholder for future CI/CD.
+# Planned flow:
+# 1. OIDC auth to AWS
+# 2. docker buildx push to ECR
+# 3. terraform plan/apply
+
+name: deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Not implemented yet
+        run: echo "Deploy pipeline will be added after laptop-deploy validation."

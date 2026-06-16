@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "schedule": "rate(6 hours)",
+  "accounts": [
+    {
+      "label": "me2dafuture",
+      "ig_user_id": "17841400000000000",
+      "username": "me2dafuture",
+      "secret_name": "ig/me2dafuture/access-token",
+      "enabled": true,
+      "media_types": ["POST", "REEL", "STORY"],
+      "metrics": [
+        "impressions",
+        "reach",
+        "engagement",
+        "likes",
+        "comments",
+        "shares",
+        "saves",
+        "video_views"
+      ]
+    }
+  ],
+  "global": {
+    "lookback_days": 7,
+    "max_media_per_run": 50
+  }
+}
