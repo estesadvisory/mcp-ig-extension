@@ -65,12 +65,6 @@ def _process_account(
         "errors": [],
     }
 
-    try:
-        ig_token = get_ig_access_token(account.secret_name)
-    except SecretLookupError as exc:
-        result["errors"].append(str(exc))
-        return result
-
     if dummy_mode:
         payload = MediaMetrics(
             ig_user_id=account.ig_user_id,
@@ -93,6 +87,12 @@ def _process_account(
             dry_run=dry_run,
         )
         result["writes"].append(write_result)
+        return result
+
+    try:
+        ig_token = get_ig_access_token(account.secret_name)
+    except SecretLookupError as exc:
+        result["errors"].append(str(exc))
         return result
 
     client = IGClient(ig_token)

@@ -24,6 +24,16 @@ def _mcp_base_url() -> str:
     return url.rstrip("/") + "/"
 
 
+def _serialize_store_content(content: str) -> str:
+    """
+    Keep metrics content as a string through MCP JSON-RPC argument parsing.
+
+    Streamable HTTP may coerce JSON-looking strings into objects before the store
+    tool runs; double-encoding ensures the server still receives a string.
+    """
+    return json.dumps(content)
+
+
 def _build_store_payload(
     logical_key: str,
     content: str,
@@ -42,7 +52,7 @@ def _build_store_payload(
             "name": "store",
             "arguments": {
                 "logical_key": logical_key,
-                "content": content,
+                "content": _serialize_store_content(content),
                 "metadata": {
                     "title": title,
                     "summary": summary,
