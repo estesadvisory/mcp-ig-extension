@@ -69,8 +69,8 @@ mcp-ig-extension/
 - AWS CLI configured (`aws sso login` or similar)
 - A deployed grok-memory-mcp Function URL
 - Secrets in AWS Secrets Manager:
-  - `mcp/ig-extension/bearer-token` (or your chosen name) — MCP Bearer token
-  - `ig/<account>/access-token` per account in `config/accounts.json`
+  - `mcp/ig-extension/bearer-token` — JSON `{"token": "..."}` (must match grok-memory-mcp `mcp_bearer_auth_secret_name`)
+  - `ig/<account>/access-token` per account — JSON `{"access_token": "..."}` or plain string
 
 ### 2. Local setup
 

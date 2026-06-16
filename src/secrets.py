@@ -48,13 +48,38 @@ def get_secret_json(secret_name: str) -> dict[str, Any]:
     return parsed
 
 
-def get_bearer_token(secret_name: str, field: str = "token") -> str:
-    """Return a bearer token from a plain string or JSON secret."""
+def _parse_secret_field(secret_name: str, field: str, *, fallback_fields: tuple[str, ...] = ()) -> str:
+    """Extract a field from JSON secret ``{"field": "..."}`` or return raw string secret."""
     raw = get_secret_string(secret_name).strip()
-    if raw.startswith("{"):
+    if not raw.startswith("{"):
+        return raw
+
+    try:
         payload = json.loads(raw)
-        if isinstance(payload, dict) and field in payload:
-            return str(payload[field])
-        if isinstance(payload, dict) and "access_token" in payload:
-            return str(payload["access_token"])
-    return raw
+    except json.JSONDecodeError as exc:
+        raise SecretLookupError(f"Secret '{secret_name}' is not valid JSON") from exc
+
+    if not isinstance(payload, dict):
+        raise SecretLookupError(f"Secret '{secret_name}' JSON root must be an object")
+
+    if field in payload and str(payload[field]).strip():
+        return str(payload[field]).strip()
+
+    for fallback in fallback_fields:
+        if fallback in payload and str(payload[fallback]).strip():
+            return str(payload[fallback]).strip()
+
+    raise SecretLookupError(
+        f"Secret '{secret_name}' JSON must include '{field}'"
+        + (f" or one of {fallback_fields}" if fallback_fields else "")
+    )
+
+
+def get_bearer_token(secret_name: str, field: str = "token") -> str:
+    """Return MCP Bearer token from JSON ``{"token": "..."}`` (preferred) or plain string."""
+    return _parse_secret_field(secret_name, field)
+
+
+def get_ig_access_token(secret_name: str) -> str:
+    """Return Meta Graph API token from JSON ``{"access_token": "..."}`` or plain string."""
+    return _parse_secret_field(secret_name, "access_token", fallback_fields=("token",))

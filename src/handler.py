@@ -21,7 +21,7 @@ from config_loader import load_accounts_config
 from ig_client import IGClient
 from mcp_client import write_metric
 from models import AccountConfig, MediaMetrics
-from secrets import SecretLookupError, get_bearer_token, get_secret_string
+from secrets import SecretLookupError, get_bearer_token, get_ig_access_token
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -55,6 +55,8 @@ def _process_account(
     mcp_token: str,
     dry_run: bool,
     dummy_mode: bool,
+    lookback_days: int,
+    max_media_per_run: int,
 ) -> dict[str, Any]:
     result: dict[str, Any] = {
         "label": account.label,
@@ -64,7 +66,7 @@ def _process_account(
     }
 
     try:
-        ig_token = get_secret_string(account.secret_name)
+        ig_token = get_ig_access_token(account.secret_name)
     except SecretLookupError as exc:
         result["errors"].append(str(exc))
         return result
@@ -94,8 +96,12 @@ def _process_account(
         return result
 
     client = IGClient(ig_token)
-    max_media = int(os.environ.get("MAX_MEDIA_PER_RUN", "50"))
-    media_items = client.list_recent_media(account.ig_user_id, limit=max_media)
+    max_media = int(os.environ.get("MAX_MEDIA_PER_RUN", str(max_media_per_run)))
+    media_items = client.list_recent_media(
+        account.ig_user_id,
+        limit=max_media,
+        lookback_days=lookback_days,
+    )
 
     for item in media_items:
         media_id = str(item.get("id", ""))
@@ -106,7 +112,11 @@ def _process_account(
             continue
 
         try:
-            metrics = client.get_media_insights(media_id, account.metrics)
+            metrics = client.get_media_insights(
+                media_id,
+                account.metrics,
+                media_type=media_type,
+            )
             payload = MediaMetrics(
                 ig_user_id=account.ig_user_id,
                 media_id=media_id,
@@ -165,6 +175,8 @@ def handler(event: dict[str, Any] | None, context: Any) -> dict[str, Any]:
                 mcp_token=mcp_token,
                 dry_run=dry_run,
                 dummy_mode=dummy_mode,
+                lookback_days=config.global_.lookback_days,
+                max_media_per_run=config.global_.max_media_per_run,
             )
         )
 

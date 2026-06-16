@@ -4,7 +4,7 @@
   "accounts": [
     {
       "label": "me2dafuture",
-      "ig_user_id": "17841400000000000",
+      "ig_user_id": "REPLACE_WITH_ME2DAFUTURE_IG_USER_ID",
       "username": "me2dafuture",
       "secret_name": "ig/me2dafuture/access-token",
       "enabled": true,

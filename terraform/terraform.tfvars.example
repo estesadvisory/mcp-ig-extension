@@ -5,6 +5,7 @@ lambda_image_uri = "990207457148.dkr.ecr.us-east-1.amazonaws.com/mcp-ig-extensio
 
 mcp_base_url         = "https://<your-mcp-function-id>.lambda-url.us-east-1.on.aws/"
 mcp_auth_secret_name = "mcp/ig-extension/bearer-token"
+# MCP secret JSON format: {"token": "<same-token-as-grok-memory-mcp-bearer-secret>"}
 
 # Optional: explicit ARNs for IG token secrets (in addition to MCP auth secret)
 # ig_secret_arns = [
